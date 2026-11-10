@@ -33,7 +33,9 @@ function launch() {
   const env = Object.assign({}, process.env);
   delete env.ELECTRON_RUN_AS_NODE;
   const bin = require(path.join(APP_DIR, "node_modules", "electron"));
-  return spawn(bin, [APP_DIR, "--remote-debugging-port=" + PORT], { env: env, stdio: "ignore" });
+  // a CI runner has no setuid sandbox helper, and Electron will not start without one
+  const extra = process.platform === "linux" && process.env.CI ? ["--no-sandbox"] : [];
+  return spawn(bin, [APP_DIR, "--remote-debugging-port=" + PORT].concat(extra), { env: env, stdio: "ignore" });
 }
 
 async function findPage() {
