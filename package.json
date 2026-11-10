@@ -1,0 +1,97 @@
+{
+  "name": "balise",
+  "version": "1.0.0",
+  "description": "Edit the metadata and cover art of your MP3/WAV files, in place, without duplicating the file.",
+  "main": "src/main.js",
+  "author": {
+    "name": "Yanis “Yvvid” Arènes",
+    "email": "contact@sinaysenera.dev"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/engine.test.js && node test/tagGuess.test.js && node test/strings.test.js",
+    "test:ui": "node test/ui.test.js",
+    "icons": "node tools/make-icons.js",
+    "dist": "electron-builder",
+    "smoke": "node tools/smoke.js"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.yanisarenes.balise",
+    "productName": "Balise",
+    "copyright": "Copyright © 2026 Yanis “Yvvid” Arènes",
+    "publish": null,
+    "files": [
+      "src/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "src/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "Balise-Setup-windows-x64.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "icon": "src/icon-1024.png",
+      "category": "public.app-category.music",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "artifactName": "Balise-macos-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "src/icon-1024.png",
+      "category": "Audio",
+      "artifactName": "Balise-linux-x64.${ext}",
+      "executableName": "balise"
+    }
+  },
+  "keywords": [
+    "mp3",
+    "wav",
+    "id3",
+    "metadata",
+    "tags",
+    "cover-art",
+    "audio"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yanis-A/balise"
+  },
+  "homepage": "https://github.com/Yanis-A/balise"
+}

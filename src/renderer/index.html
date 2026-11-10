@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; script-src 'self';">
+<title>Balise</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- File row -->
+  <div class="filebar">
+    <span class="fb-label" data-t="fileLabel">File</span>
+    <span class="fb-name mono" id="fileName" data-t="noFile">No file open</span>
+    <button class="btn" id="detectBtn" type="button" disabled data-t="fillFromName">Fill from file name</button>
+    <button class="btn" id="browseBtn" type="button" data-t="openFile">Open a file…</button>
+  </div>
+
+  <div class="detect-row"><span class="detect-note" id="detectNote"></span></div>
+
+  <!-- Form -->
+  <main class="sheet" id="sheet">
+    <div class="grid">
+
+      <div class="row full">
+        <label class="lab" for="fTitle" data-t="title">Title</label>
+        <input type="text" id="fTitle" autocomplete="off" data-tp="phTitle">
+      </div>
+
+      <div class="row">
+        <label class="lab" for="fArtist" data-t="artist">Artist</label>
+        <input type="text" id="fArtist" autocomplete="off" data-tp="phArtist">
+      </div>
+      <div class="row">
+        <label class="lab" for="fAlbumArtist" data-t="albumArtist">Album artist</label>
+        <input type="text" id="fAlbumArtist" autocomplete="off" data-tp="phAlbumArtist">
+      </div>
+
+      <div class="row">
+        <label class="lab" for="fAlbum" data-t="album">Album</label>
+        <input type="text" id="fAlbum" autocomplete="off" data-tp="phAlbum">
+      </div>
+      <div class="row">
+        <label class="lab" for="fYear" data-t="year">Year</label>
+        <div class="pair">
+          <input type="text" id="fYear" inputmode="numeric" maxlength="4" autocomplete="off" data-tp="phYear" style="width:74px">
+          <label class="lab inline" for="fTrack" data-t="track">Track</label>
+          <input type="text" id="fTrack" inputmode="numeric" maxlength="3" autocomplete="off" data-tp="phTrack" style="width:46px">
+          <span class="sep">/</span>
+          <input type="text" id="fTrackTotal" inputmode="numeric" maxlength="3" autocomplete="off" data-tp="phTrackTotal" style="width:46px">
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="lab" for="fGenre" data-t="genre">Genre</label>
+        <div class="combo" id="genreCombo">
+          <input type="text" id="fGenre" autocomplete="off" data-tp="phGenre"
+                 role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="genreListbox">
+          <button class="combo-toggle" type="button" tabindex="-1" aria-label="Genres">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <ul class="combo-list" id="genreListbox" role="listbox" hidden></ul>
+        </div>
+      </div>
+      <div class="row">
+        <label class="lab" data-t="cover">Cover</label>
+        <div class="coverline">
+          <div class="cover-thumb" id="coverDrop" tabindex="0" role="button" aria-label="Cover" data-ttitle="cover">
+            <img id="coverImg" alt="" hidden>
+            <svg class="cover-empty" id="coverEmpty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          </div>
+          <div class="cover-btns">
+            <button class="btn" id="coverChangeBtn" type="button" data-t="coverBrowse">Browse…</button>
+            <button class="btn" id="coverRemoveBtn" type="button" data-t="coverRemove">Remove</button>
+          </div>
+          <span class="cover-size" id="coverSize"></span>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="lab" for="fBpm" data-t="tempo">Tempo</label>
+        <input type="text" id="fBpm" inputmode="decimal" maxlength="7" autocomplete="off" data-tp="phTempo" style="width:88px">
+      </div>
+      <div class="row">
+        <label class="lab" for="fKey" data-t="key">Key</label>
+        <div class="combo narrow" id="keyCombo">
+          <input type="text" id="fKey" maxlength="3" autocomplete="off" data-tp="phKey"
+                 role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="keyListbox">
+          <button class="combo-toggle" type="button" tabindex="-1" aria-label="Keys">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <ul class="combo-list" id="keyListbox" role="listbox" hidden></ul>
+        </div>
+      </div>
+
+      <div class="row full">
+        <label class="lab" for="fComment" data-t="comment">Comment</label>
+        <input type="text" id="fComment" autocomplete="off" data-tp="phComment">
+      </div>
+
+      <div class="divider full"><span class="divider-cap" data-t="credits">Credits</span></div>
+
+      <div class="row">
+        <label class="lab" for="fComposer" data-t="composer">Composer</label>
+        <input type="text" id="fComposer" autocomplete="off" data-tp="phComposer">
+      </div>
+      <div class="row">
+        <label class="lab" for="fPublisher" data-t="publisher">Publisher</label>
+        <input type="text" id="fPublisher" autocomplete="off" data-tp="phPublisher">
+      </div>
+
+      <div class="row">
+        <label class="lab" for="fIsrc" data-t="isrc">ISRC</label>
+        <input type="text" id="fIsrc" maxlength="15" autocomplete="off" data-tp="phIsrc">
+      </div>
+
+    </div>
+
+    <!-- Shown instead of the form when nothing is open; the window is the drop target -->
+    <div class="empty" id="empty">
+      <p class="empty-line" data-t="dropHint">Drop an MP3 or WAV here, or open one</p>
+      <p class="empty-err" id="dzError"></p>
+    </div>
+  </main>
+
+  <!-- Action bar -->
+  <div class="actionbar">
+    <span class="led" id="led" aria-hidden="true"></span>
+    <span class="status" id="statusText" data-t="clean">No changes</span>
+    <span class="ab-spacer"></span>
+    <span class="ab-meta mono" id="fileMeta"></span>
+    <button class="btn" id="resetBtn" type="button" disabled data-t="reset">Reset</button>
+    <button class="btn primary" id="exportBtn" type="button" disabled data-t="save">Save</button>
+  </div>
+
+  <div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script src="strings.js"></script>
+<script src="tagGuess.js"></script>
+<script src="renderer.js"></script>
+</body>
+</html>

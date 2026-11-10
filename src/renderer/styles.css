@@ -1,0 +1,310 @@
+/* Balise — a Windows utility, not a product page.
+   Flat surfaces, system font, right-aligned labels, 2 px corners. The only
+   thing that carries any personality is the state LED in the title strip.
+   No webfont: everything is the system UI stack, so the app makes no network
+   request at all. */
+
+:root {
+  --ground:   #f0f0f0;
+  --strip:    #e7e7e7;
+  --field:    #ffffff;
+  --line:     #d6d6d6;
+  --line-in:  #b8b8b8;
+  --ink:      #1a1a1a;
+  --ink-lab:  #3d3d3d;
+  --ink-mute: #6a6a6a;
+  --ink-faint:#9a9a9a;
+  --sys:      #0067c0;
+  --sys-soft: #cce2f5;
+  --danger:   #b3261e;
+  --led-off:  #b0b4b8;
+  --led-dirty:#e0a12c;
+  --led-ok:   #3d9a5b;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:   #202020;
+    --strip:    #2b2b2b;
+    --field:    #2d2d2d;
+    --line:     #3a3a3a;
+    --line-in:  #4a4a4a;
+    --ink:      #f0f0f0;
+    --ink-lab:  #cfcfcf;
+    --ink-mute: #9a9a9a;
+    --ink-faint:#6f6f6f;
+    --sys:      #4cc2ff;
+    --sys-soft: #1d3d52;
+    --danger:   #ff6b60;
+    --led-off:  #5a5f64;
+    --led-dirty:#e0a12c;
+    --led-ok:   #4ac274;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-size: 12.5px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  overflow: hidden;
+}
+.mono { font-family: Consolas, ui-monospace, "Cascadia Mono", monospace; }
+input, button { font-family: inherit; font-size: inherit; color: inherit; }
+input { user-select: text; }
+::selection { background: var(--sys-soft); }
+
+/* The app name is not repeated here: Windows already draws it in the native
+   title bar, one line above.
+
+   The one piece of personality: a rack-panel state light, sitting next to the
+   status it reports rather than off on its own. */
+.led {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--led-off);
+  flex: none;
+  transition: background .18s ease, box-shadow .18s ease;
+}
+.led.dirty { background: var(--led-dirty); box-shadow: 0 0 6px var(--led-dirty); }
+.led.ok    { background: var(--led-ok);    box-shadow: 0 0 6px var(--led-ok); }
+
+/* ---------- file row ---------- */
+.filebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.fb-label { color: var(--ink-lab); flex: none; }
+.fb-label::after { content: " :"; }
+.fb-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--ink);
+  background: var(--field);
+  border: 1px solid var(--line-in);
+  border-radius: 2px;
+  padding: 4px 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fb-name.none { color: var(--ink-faint); }
+
+/* ---------- buttons ---------- */
+.btn {
+  flex: none;
+  background: var(--field);
+  border: 1px solid var(--line-in);
+  border-radius: 2px;
+  padding: 4px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s ease, border-color .12s ease;
+}
+.btn:hover:not(:disabled) { background: var(--sys-soft); border-color: var(--sys); }
+.btn:active:not(:disabled) { background: var(--line); }
+.btn:disabled { color: var(--ink-faint); background: var(--ground); cursor: default; }
+.btn.primary { background: var(--sys); border-color: var(--sys); color: #fff; font-weight: 600; }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.1); }
+.btn.primary:disabled { background: var(--ground); border-color: var(--line-in); color: var(--ink-faint); font-weight: 400; }
+:focus-visible { outline: 1px dotted var(--ink); outline-offset: 1px; }
+
+/* ---------- detection note ---------- */
+.detect-row { flex: none; padding: 0 12px; }
+.detect-note {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  min-width: 0; font-size: 11.5px;
+  padding: 7px 0 0;
+}
+.detect-note:empty { display: none; }
+.dn-lead { font-weight: 700; color: var(--ink-mute); }
+.detect-note.found .dn-lead { color: var(--led-ok); }
+.dn-chip {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  max-width: 230px; min-width: 0;
+  padding: 1px 7px;
+  border: 1px solid var(--line-in);
+  border-radius: 2px;
+  background: var(--field);
+}
+.dn-chip em { font-style: normal; flex: none; font-size: 10px; color: var(--ink-mute); }
+.dn-chip > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dn-skip { color: var(--ink-faint); }
+
+/* ---------- form sheet ---------- */
+.sheet { flex: 1; min-height: 0; padding: 10px 12px 4px; position: relative; overflow: auto; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+  align-content: start;
+}
+.sheet.blank .grid { opacity: .4; pointer-events: none; }
+.full { grid-column: 1 / -1; }
+.row { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 9px; }
+.row.full { grid-template-columns: 104px minmax(0, 1fr); }
+.lab { color: var(--ink-lab); text-align: right; }
+.lab.inline { text-align: right; flex: none; }
+.pair { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.pair .lab.inline { width: auto; }
+.sep { color: var(--ink-faint); }
+.grow { flex: 1; min-width: 0; }
+
+input[type="text"] {
+  width: 100%;
+  background: var(--field);
+  border: 1px solid var(--line-in);
+  border-radius: 2px;
+  padding: 4px 7px;
+  outline: none;
+  min-width: 0;
+}
+input[type="text"]:focus { border-color: var(--sys); box-shadow: inset 0 0 0 1px var(--sys); }
+input::placeholder { color: var(--ink-faint); }
+
+.divider {
+  display: flex; align-items: center; gap: 8px;
+  margin: 7px 0 3px;
+  color: var(--ink-mute);
+}
+.divider-cap { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; flex: none; }
+.divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* ---------- cover ---------- */
+.coverline { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cover-thumb {
+  width: 40px; height: 40px; flex: none;
+  border: 1px solid var(--line-in);
+  border-radius: 2px;
+  background: var(--field);
+  display: grid; place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+.cover-thumb.drag-over { border-color: var(--sys); box-shadow: inset 0 0 0 1px var(--sys); }
+/* the display:block below would otherwise beat the UA [hidden] rule and leave
+   an empty box in the flow, shoving the placeholder icon off-centre */
+.cover-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover-thumb img[hidden] { display: none; }
+.cover-empty { width: 17px; height: 17px; color: var(--ink-faint); display: block; }
+.cover-empty[hidden] { display: none; }
+.cover-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+/* the cover is the only tag that weighs anything, so its weight is on screen */
+.cover-size {
+  font-size: 11px; color: var(--ink-faint);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.cover-size.shrunk { color: var(--led-ok); }
+
+/* ---------- empty state: the sheet itself is the drop target ---------- */
+.empty {
+  position: absolute;
+  inset: 10px 12px 4px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed var(--line-in);
+  border-radius: 2px;
+  background: var(--ground);
+  text-align: center;
+}
+.sheet.blank .empty { display: flex; }
+.sheet.blank.drag-over .empty { border-color: var(--sys); background: var(--sys-soft); }
+.empty-line { margin: 0; color: var(--ink-mute); }
+.empty-err { margin: 0; color: var(--danger); font-weight: 600; min-height: 1em; }
+
+/* ---------- action bar ---------- */
+.actionbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--strip);
+  border-top: 1px solid var(--line);
+  flex: none;
+}
+.status { color: var(--ink-mute); }
+.ab-spacer { flex: 1; }
+.ab-meta { font-size: 11px; color: var(--ink-faint); margin-right: 4px; }
+
+/* ---------- combobox (kept: a native datalist cannot be height-capped) ---------- */
+.combo { position: relative; display: flex; flex-direction: column; min-width: 0; }
+/* a three-character key does not need the full column */
+.combo.narrow { width: 108px; }
+.combo > input { padding-right: 22px; }
+.combo-toggle {
+  position: absolute; right: 1px; top: 1px; bottom: 1px;
+  width: 19px;
+  display: grid; place-items: center;
+  padding: 0; border: none; background: transparent;
+  color: var(--ink-mute); cursor: pointer;
+}
+.combo-toggle svg { width: 11px; height: 11px; }
+.combo-toggle:hover { color: var(--ink); }
+.combo-list {
+  position: absolute;
+  z-index: 60;
+  left: 0; right: 0;
+  margin: 0; padding: 1px;
+  list-style: none;
+  background: var(--field);
+  border: 1px solid var(--line-in);
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+  max-height: 210px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.combo-list[hidden] { display: none; }
+.combo-list.below { top: calc(100% + 2px); }
+.combo-list.above { bottom: calc(100% + 2px); }
+.combo-option {
+  display: flex; align-items: baseline; gap: 6px;
+  padding: 3px 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.combo-note { color: var(--ink-faint); font-size: 10.5px; margin-left: auto; }
+.combo-option:hover { background: var(--sys-soft); }
+.combo-option.active { background: var(--sys); color: #fff; }
+.combo-option.active .combo-note { color: rgba(255,255,255,.75); }
+.combo-empty { padding: 4px 7px; color: var(--ink-faint); }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 46px;
+  transform: translate(-50%, 8px);
+  background: var(--ink);
+  color: var(--ground);
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s ease, transform .16s ease;
+  max-width: 88vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.error { background: var(--danger); color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .toast, .led { transition: none; }
+}

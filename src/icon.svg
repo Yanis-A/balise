@@ -1,0 +1,28 @@
+<!-- Master artwork for the app icon: a beacon — mast, light, two waves.
+     Amber #e0a12c is the same colour as the state LED in the app.
+
+     Two variants on purpose. Below ~24 px the waves close up into a smudge and
+     the mast gets too thin to read, so the small variant drops the waves and
+     fattens everything. icon.ico carries the right one at each size; see
+     tools/make-icons.js. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 48" width="96" height="48">
+
+  <!-- full: 32 px and up -->
+  <g id="full">
+    <rect width="48" height="48" rx="10" fill="#1c1f24"/>
+    <path d="M19 40 L21.5 22 h5 L29 40 Z" fill="#cfd5dc"/>
+    <rect x="16" y="39" width="16" height="4" rx="1.4" fill="#cfd5dc"/>
+    <circle cx="24" cy="15" r="5.5" fill="#e0a12c"/>
+    <path d="M33 10.5 a10 10 0 0 1 0 9" fill="none" stroke="#e0a12c" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M15 19.5 a10 10 0 0 1 0 -9" fill="none" stroke="#e0a12c" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- small: 16 and 24 px — no waves, heavier mast, larger light -->
+  <g id="small" transform="translate(48 0)">
+    <rect width="48" height="48" rx="7" fill="#1c1f24"/>
+    <path d="M16.5 40 L20 21 h8 L31.5 40 Z" fill="#cfd5dc"/>
+    <rect x="13" y="39" width="22" height="5" rx="1.6" fill="#cfd5dc"/>
+    <circle cx="24" cy="13.5" r="8" fill="#e0a12c"/>
+  </g>
+
+</svg>

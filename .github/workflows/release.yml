@@ -1,0 +1,94 @@
+name: Release
+
+# A version tag (v1.0.0) tests Balise, builds it for each system, checks every
+# build opens, and prepares a draft release with them. Running it by hand does
+# all of it except the release, to try a change before tagging.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      # the interface suite drives the real app, which needs a display
+      - run: xvfb-run -a npm run test:ui
+
+  build:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, args: --win, app: dist/win-unpacked/Balise.exe }
+          - { os: macos-latest, args: --mac, app: dist/mac-arm64/Balise.app/Contents/MacOS/Balise }
+          - { os: ubuntu-latest, args: --linux, app: dist/linux-unpacked/balise }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Check the tag matches the app version
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          app=$(node -p "require('./package.json').version")
+          test "v$app" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} but package.json says $app"; exit 1; }
+      - run: npm ci
+      - name: Build
+        run: npx electron-builder ${{ matrix.args }} --publish never
+        env:
+          # no paid certificate: macOS gets an ad-hoc signature, and nothing
+          # goes looking for one in the keychain
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - name: The macOS apps carry a valid signature
+        if: runner.os == 'macOS'
+        run: |
+          for app in dist/mac-arm64/Balise.app dist/mac/Balise.app; do
+            codesign --verify --deep --strict --verbose=2 "$app"
+          done
+      - name: The build opens
+        if: runner.os != 'Linux'
+        run: node tools/smoke.js "${{ matrix.app }}"
+      - name: The build opens (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a node tools/smoke.js "${{ matrix.app }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: balise-${{ runner.os }}
+          path: |
+            dist/Balise-Setup-windows-x64.exe
+            dist/Balise-macos-*.dmg
+            dist/Balise-linux-x64.AppImage
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Draft the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha256sum Balise-* > SHA256SUMS.txt
+          gh release create "${GITHUB_REF_NAME}" Balise-* SHA256SUMS.txt \
+            --repo "${GITHUB_REPOSITORY}" --draft --title "Balise ${GITHUB_REF_NAME#v}" --generate-notes
