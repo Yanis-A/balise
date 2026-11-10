@@ -202,9 +202,11 @@ input::placeholder { color: var(--ink-faint); }
 .cover-empty[hidden] { display: none; }
 .cover-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 /* the cover is the only tag that weighs anything, so its weight is on screen */
+/* never shrunk: it only ever reads "37 Ko" or "1,2 Mo", and an ellipsis there
+   left "37 ..." at the default window size. The buttons beside it wrap instead. */
 .cover-size {
   font-size: 11px; color: var(--ink-faint);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  white-space: nowrap; flex: none;
 }
 .cover-size.shrunk { color: var(--led-ok); }
 
