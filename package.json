@@ -4,7 +4,7 @@
   "description": "Edit the metadata and cover art of your MP3/WAV files, in place, without duplicating the file.",
   "main": "src/main.js",
   "author": {
-    "name": "Yanis “Yvvid” Arènes",
+    "name": "Yanis “Yvvid” Arenes",
     "email": "contact@sinaysenera.dev"
   },
   "license": "MIT",
@@ -23,7 +23,7 @@
   "build": {
     "appId": "com.yanisarenes.balise",
     "productName": "Balise",
-    "copyright": "Copyright © 2026 Yanis “Yvvid” Arènes",
+    "copyright": "Copyright © 2026 Yanis “Yvvid” Arenes, Quiet Place Sounds",
     "publish": null,
     "files": [
       "src/**/*",
